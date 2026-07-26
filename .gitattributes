@@ -1,3 +1,5 @@
-*.java linguist-language=java
-*.so linguist-language=java
-*.service linguist-language=c++
+*.java linguist-language=java;
+*.so linguist-language=java;
+*.service linguist-language=c++;
+*.sh linguist-language=shell;
+*.ps1 linguist-language=powershell;
