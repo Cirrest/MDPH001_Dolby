@@ -1,0 +1,3 @@
+# The 32-bit MediaTek Audio HAL hosts the DAP effect and must discover the
+# already-running AIDL DMS service. This is the only observed blocking denial.
+allow mtk_hal_audio default_android_service service_manager find
