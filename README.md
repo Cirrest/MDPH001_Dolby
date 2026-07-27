@@ -11,7 +11,7 @@
 2.添加Dolby AC-4/AC-3/E-AC3音频解码器，可亮标并处理输出AppleMusic、QQ音乐、哔哩哔哩、iQIYI等软件的杜比全景声音频</br>
 3.移植并适调iPad同款DolbyAtmos双耳空间渲染，闻所未闻的感染力，极为震撼。</br>
 4.已做兼容性处理，适配100级音量调节及曲线，可与原厂AudioConsloe同开同用，DAP音效控制器内全局Dolby处理关闭后即可恢复原厂全局SRC绕过。</br>
-5.扬声器、3.5mm、4.4mm均可享受DolbyAtmos输出。</br>
+5.扬声器、3.5mm、4.4mm、蓝牙均可享受DolbyAtmos输出。</br>
 
 ###  *要求* 
 ***
