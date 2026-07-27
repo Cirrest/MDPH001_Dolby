@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 final class GeqGainMapper {
     static final int BAND_COUNT = 20;

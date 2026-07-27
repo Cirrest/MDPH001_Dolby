@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import java.util.Arrays;
 
@@ -37,6 +37,26 @@ public final class DaxParameterProtocolTest {
                 intsToLittleEndian(0x016E0205),
                 DaxParameterProtocol.encodeParameterKey(0x016E0205));
 
+        assertEquals(0x4D445254, DaxParameterProtocol.EFFECT_PARAM_ROUTE_SYNC);
+        assertArrayEquals(
+                intsToLittleEndian(0x00000008),
+                DaxParameterProtocol.encodeRouteDevice(0x00000008));
+
+        assertEquals(
+                0x00030002,
+                DaxParameterProtocol.tuningDeviceNameLengthKey(3));
+        assertEquals(
+                0x00030004,
+                DaxParameterProtocol.selectedTuningDeviceKey(3));
+        byte[] selectedTuning = DaxParameterProtocol.encodeSelectedTuningDevice(
+                3,
+                "default_headphone");
+        assertEquals(21, selectedTuning.length);
+        assertEquals(3, DaxParameterProtocol.decodeInt(selectedTuning, 0));
+        assertEquals(
+                "default_headphone",
+                DaxParameterProtocol.decodeUtf8String(selectedTuning, 4));
+
         System.out.println("DaxParameterProtocolTest PASS");
     }
 
@@ -55,6 +75,12 @@ public final class DaxParameterProtocolTest {
 
     private static void assertEquals(int expected, int actual) {
         if (expected != actual) {
+            throw new AssertionError("expected=" + expected + " actual=" + actual);
+        }
+    }
+
+    private static void assertEquals(String expected, String actual) {
+        if (!expected.equals(actual)) {
             throw new AssertionError("expected=" + expected + " actual=" + actual);
         }
     }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cirrest.dolbycontrol.mdph001"
-    android:versionCode="101"
-    android:versionName="1.0.1">
+    android:versionCode="107"
+    android:versionName="1.0.7">
 
     <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="29" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -15,13 +15,14 @@
         android:allowBackup="false"
         android:debuggable="false"
         android:hasCode="true"
-        android:label="MD-PH-001 Dolby Control"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        android:label="MIAD01 Dolby Atoms"
+        android:theme="@android:style/Theme.Material.NoActionBar"
         android:usesCleartextTraffic="false"
         android:usesNonSdkApi="true">
 
         <activity
-            android:name="com.codex.dolbycontrol.MainActivity"
+            android:name="com.mdph.dolbycontrol.MainActivity"
+            android:configChanges="colorMode"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,13 +31,13 @@
         </activity>
 
         <service
-            android:name="com.codex.dolbycontrol.DolbyControlService"
+            android:name="com.mdph.dolbycontrol.DolbyControlService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback"
             android:stopWithTask="false" />
 
         <receiver
-            android:name="com.codex.dolbycontrol.BootReceiver"
+            android:name="com.mdph.dolbycontrol.BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

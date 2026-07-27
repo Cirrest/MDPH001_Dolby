@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import android.media.audiofx.AudioEffect;
 
@@ -17,6 +17,10 @@ final class DaxController implements AutoCloseable {
     private final Method setParameterBytes;
 
     static DaxController open() throws Exception {
+        return open(0);
+    }
+
+    static DaxController open(int sessionId) throws Exception {
         AudioEffect.Descriptor descriptor = findDescriptor();
         if (descriptor == null) {
             throw new IllegalStateException("DAP implementation UUID is not registered");
@@ -24,7 +28,8 @@ final class DaxController implements AutoCloseable {
         Constructor<AudioEffect> constructor = AudioEffect.class.getConstructor(
                 UUID.class, UUID.class, int.class, int.class);
         try {
-            return new DaxController(constructor.newInstance(EFFECT_TYPE_NULL, DAP_UUID, 1, 0));
+            return new DaxController(constructor.newInstance(
+                    EFFECT_TYPE_NULL, DAP_UUID, 1, sessionId));
         } catch (InvocationTargetException error) {
             Throwable cause = error.getCause();
             if (cause instanceof Exception) {
@@ -36,10 +41,12 @@ final class DaxController implements AutoCloseable {
 
     private DaxController(AudioEffect effect) throws NoSuchMethodException {
         this.effect = effect;
-        getParameter = AudioEffect.class.getMethod(
+        getParameter = AudioEffect.class.getDeclaredMethod(
                 "getParameter", byte[].class, byte[].class);
-        setParameterBytes = AudioEffect.class.getMethod(
+        setParameterBytes = AudioEffect.class.getDeclaredMethod(
                 "setParameter", byte[].class, byte[].class);
+        getParameter.setAccessible(true);
+        setParameterBytes.setAccessible(true);
     }
 
     String getName() {
@@ -104,6 +111,50 @@ final class DaxController implements AutoCloseable {
                         DaxParameterProtocol.encodeParameterKey(
                                 DaxParameterProtocol.EFFECT_PARAM_CPDP_VALUES),
                         payload));
+    }
+
+    void syncOutputDevice(int deviceMask) {
+        checkStatus(
+                "sync output device 0x" + Integer.toHexString(deviceMask),
+                invoke(
+                        setParameterBytes,
+                        DaxParameterProtocol.encodeParameterKey(
+                                DaxParameterProtocol.EFFECT_PARAM_ROUTE_SYNC),
+                        DaxParameterProtocol.encodeRouteDevice(deviceMask)));
+    }
+
+    String getSelectedTuningDevice(int port) {
+        byte[] lengthResult = new byte[4];
+        checkStatus(
+                "get tuning device name length for port " + port,
+                invoke(
+                        getParameter,
+                        DaxParameterProtocol.encodeParameterKey(
+                                DaxParameterProtocol.tuningDeviceNameLengthKey(port)),
+                        lengthResult));
+        int length = DaxParameterProtocol.decodeInt(lengthResult, 0);
+        if (length <= 0 || length > 4096) {
+            throw new IllegalStateException("invalid tuning device name length " + length);
+        }
+        byte[] result = new byte[((length + 4) >> 2) * 4];
+        checkStatus(
+                "get selected tuning device for port " + port,
+                invoke(
+                        getParameter,
+                        DaxParameterProtocol.encodeParameterKey(
+                                DaxParameterProtocol.selectedTuningDeviceKey(port)),
+                        result));
+        return DaxParameterProtocol.decodeUtf8String(result, 0);
+    }
+
+    void setSelectedTuningDevice(int port, String deviceId) {
+        checkStatus(
+                "set selected tuning device for port " + port,
+                invoke(
+                        setParameterBytes,
+                        DaxParameterProtocol.encodeParameterKey(
+                                DaxParameterProtocol.EFFECT_PARAM_SELECTED_TUNING),
+                        DaxParameterProtocol.encodeSelectedTuningDevice(port, deviceId)));
     }
 
     boolean isAlive() {

@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 public final class ModePolicyTest {
     public static void main(String[] args) {

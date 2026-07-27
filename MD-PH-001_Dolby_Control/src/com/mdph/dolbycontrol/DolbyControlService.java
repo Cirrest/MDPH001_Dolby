@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.media.AudioDeviceCallback;
 import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
+import android.media.AudioPlaybackConfiguration;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -22,6 +23,7 @@ import android.os.Looper;
 import android.util.Log;
 
 import java.util.Set;
+import java.util.Locale;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public final class DolbyControlService extends Service {
@@ -53,9 +55,11 @@ public final class DolbyControlService extends Service {
     private HandlerThread workerThread;
     private Handler worker;
     private DaxController controller;
+    private UiText uiText;
     private int lastVolume = -1;
     private int lastMaxVolume = -1;
-    private String lastRoute = "";
+    private int lastDeviceMask;
+    private volatile boolean playbackPresent;
 
     private final Runnable healthCheck = new Runnable() {
         @Override
@@ -93,10 +97,21 @@ public final class DolbyControlService extends Service {
         }
     };
 
+    private final AudioManager.AudioPlaybackCallback playbackCallback =
+            new AudioManager.AudioPlaybackCallback() {
+                @Override
+                public void onPlaybackConfigChanged(
+                        java.util.List<AudioPlaybackConfiguration> configs) {
+                    playbackPresent = configs != null && !configs.isEmpty();
+                    scheduleRefresh(false);
+                }
+            };
+
     @Override
     public void onCreate() {
         super.onCreate();
         preferences = getSharedPreferences(PREFS, MODE_PRIVATE);
+        uiText = UiText.forLanguageTag(Locale.getDefault().toLanguageTag());
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         createNotificationChannel();
         startForeground(NOTIFICATION_ID, buildNotification());
@@ -108,6 +123,10 @@ public final class DolbyControlService extends Service {
         IntentFilter volumeFilter = new IntentFilter("android.media.VOLUME_CHANGED_ACTION");
         registerReceiver(volumeReceiver, volumeFilter);
         audioManager.registerAudioDeviceCallback(deviceCallback, mainHandler);
+        if (Build.VERSION.SDK_INT >= 26) {
+            audioManager.registerAudioPlaybackCallback(playbackCallback, mainHandler);
+            playbackPresent = !audioManager.getActivePlaybackConfigurations().isEmpty();
+        }
         worker.post(healthCheck);
     }
 
@@ -126,6 +145,9 @@ public final class DolbyControlService extends Service {
     public void onDestroy() {
         unregisterReceiver(volumeReceiver);
         audioManager.unregisterAudioDeviceCallback(deviceCallback);
+        if (Build.VERSION.SDK_INT >= 26) {
+            audioManager.unregisterAudioPlaybackCallback(playbackCallback);
+        }
         if (worker != null) {
             worker.removeCallbacksAndMessages(null);
         }
@@ -148,6 +170,7 @@ public final class DolbyControlService extends Service {
                     if (volumeMayHaveChanged && ModePolicy.usesCustomGeq(getDesiredMode())) {
                         applyCustomGeq(controller);
                     }
+                    syncOutputDevice(false);
                     refreshSnapshot();
                 } catch (Throwable error) {
                     handleControllerFailure(error);
@@ -162,8 +185,30 @@ public final class DolbyControlService extends Service {
             public void run() {
                 try {
                     ensureController();
+                    syncOutputDevice(false);
                     operation.run(controller);
                     refreshSnapshot();
+                } catch (Throwable error) {
+                    handleControllerFailure(error);
+                }
+            }
+        });
+    }
+
+    private void restartAudioService() {
+        worker.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    closeController();
+                    AudioServiceRestartRequest.create(
+                            getFilesDir(), System.currentTimeMillis());
+                    worker.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            scheduleRefresh(false);
+                        }
+                    }, 3000L);
                 } catch (Throwable error) {
                     handleControllerFailure(error);
                 }
@@ -177,6 +222,7 @@ public final class DolbyControlService extends Service {
         }
         closeController();
         controller = DaxController.open();
+        syncOutputDevice(true);
 
         int actualProfile = controller.getProfile();
         SharedPreferences.Editor editor = preferences.edit();
@@ -197,6 +243,7 @@ public final class DolbyControlService extends Service {
     }
 
     private void enforceDesiredState() throws Exception {
+        syncOutputDevice(false);
         boolean enabled = preferences.getBoolean(KEY_ENABLED, true);
         int actualEnabled = controller.getEnable();
         if ((actualEnabled != 0) != enabled) {
@@ -213,12 +260,10 @@ public final class DolbyControlService extends Service {
 
         int volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        String route = getOutputRoute();
         if (ModePolicy.usesCustomGeq(getDesiredMode())
                 && (volume != lastVolume || maxVolume != lastMaxVolume)) {
             applyCustomGeq(controller);
         }
-        lastRoute = route;
     }
 
     private void applyDesiredState() throws Exception {
@@ -239,33 +284,42 @@ public final class DolbyControlService extends Service {
     }
 
     private void applyStoredOverrides(int profile) {
-        applyStoredInt(profile, "ieq", DaxParameterProtocol.PARAM_IEQ_PRESET);
+        applyStoredOverrides(controller, profile);
+    }
+
+    private void applyStoredOverrides(DaxController target, int profile) {
+        applyStoredInt(target, profile, "ieq", DaxParameterProtocol.PARAM_IEQ_PRESET);
         applyStoredInt(
+                target,
                 profile,
                 "dialog_enabled",
                 DaxParameterProtocol.PARAM_DIALOG_ENHANCEMENT_ENABLE);
         applyStoredInt(
+                target,
                 profile,
                 "dialog_amount",
                 DaxParameterProtocol.PARAM_DIALOG_ENHANCEMENT_AMOUNT);
-        applyStoredInt(profile, "leveler", DaxParameterProtocol.PARAM_VOLUME_LEVELER);
+        applyStoredInt(target, profile, "leveler", DaxParameterProtocol.PARAM_VOLUME_LEVELER);
         applyStoredInt(
+                target,
                 profile,
                 "headphone_virtualizer",
                 DaxParameterProtocol.PARAM_HEADPHONE_VIRTUALIZER);
         applyStoredInt(
+                target,
                 profile,
                 "speaker_virtualizer",
                 DaxParameterProtocol.PARAM_SPEAKER_VIRTUALIZER);
     }
 
-    private void applyStoredInt(int profile, String name, int parameter) {
+    private void applyStoredInt(
+            DaxController target, int profile, String name, int parameter) {
         String key = profileKey(profile, name);
         if (!preferences.contains(key)) {
             return;
         }
         try {
-            controller.setProfileInt(profile, parameter, preferences.getInt(key, 0));
+            target.setProfileInt(profile, parameter, preferences.getInt(key, 0));
         } catch (RuntimeException error) {
             Log.w(TAG, "Unable to restore " + key, error);
         }
@@ -301,8 +355,8 @@ public final class DolbyControlService extends Service {
         next.maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         next.outputRoute = getOutputRoute();
         next.tuningStatus = controller.getName()
-                + " / " + next.profileCount + " profiles"
-                + " / effect " + controller.getEffectId();
+                + " / " + next.profileCount + " " + uiText.get(UiText.Key.PROFILES)
+                + " / " + uiText.get(UiText.Key.EFFECT) + " " + controller.getEffectId();
         next.geqDb = loadGeqDb();
         next.geqEnabled = preferences.getBoolean(KEY_GEQ_ENABLED, true);
 
@@ -356,7 +410,7 @@ public final class DolbyControlService extends Service {
             snapshot.hasControl = false;
             snapshot.lastError = error.getClass().getSimpleName()
                     + ": " + String.valueOf(error.getMessage());
-            snapshot.tuningStatus = "Not connected";
+            snapshot.tuningStatus = uiText.get(UiText.Key.NOT_CONNECTED);
             failed = snapshot.copy();
         }
         notifyListeners(failed);
@@ -402,33 +456,72 @@ public final class DolbyControlService extends Service {
                 return route;
             }
         }
-        return fallback == null ? "Unknown" : routeName(fallback);
+        return fallback == null ? uiText.get(UiText.Key.ROUTE_UNKNOWN) : routeName(fallback);
     }
 
-    private static String routeName(AudioDeviceInfo device) {
+    private int getOutputDeviceMask() {
+        AudioDeviceInfo[] devices = audioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+        int fallback = 0;
+        for (AudioDeviceInfo device : devices) {
+            int mask = OutputDeviceRoute.nativeMaskForType(device.getType());
+            if (mask == 0) {
+                continue;
+            }
+            if (device.getType() == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
+                    || device.getType() == AudioDeviceInfo.TYPE_BUILTIN_EARPIECE) {
+                fallback = mask;
+            } else {
+                return mask;
+            }
+        }
+        return fallback;
+    }
+
+    private void syncOutputDevice(boolean force) {
+        int deviceMask = getOutputDeviceMask();
+        if (deviceMask == 0 || (!force && deviceMask == lastDeviceMask)) {
+            return;
+        }
+        controller.syncOutputDevice(deviceMask);
+        int tuningPort = OutputDeviceRoute.tuningPortForMask(deviceMask);
+        String tuningDevice = OutputDeviceRoute.defaultTuningDeviceForMask(deviceMask);
+        if (tuningPort >= 0 && tuningDevice != null) {
+            String selected = controller.getSelectedTuningDevice(tuningPort);
+            if (!tuningDevice.equals(selected)) {
+                controller.setSelectedTuningDevice(tuningPort, tuningDevice);
+            }
+            Log.i(
+                    TAG,
+                    "Selected DAP tuning " + tuningDevice + " for port " + tuningPort);
+        }
+        lastDeviceMask = deviceMask;
+        Log.i(TAG, "Synced DAP output device 0x" + Integer.toHexString(deviceMask));
+    }
+
+    private String routeName(AudioDeviceInfo device) {
         String type;
         switch (device.getType()) {
             case AudioDeviceInfo.TYPE_WIRED_HEADSET:
             case AudioDeviceInfo.TYPE_WIRED_HEADPHONES:
-                type = "Headphone";
+                type = uiText.get(UiText.Key.ROUTE_HEADPHONE);
                 break;
             case AudioDeviceInfo.TYPE_BLUETOOTH_A2DP:
             case AudioDeviceInfo.TYPE_BLUETOOTH_SCO:
-                type = "Bluetooth";
+                type = uiText.get(UiText.Key.ROUTE_BLUETOOTH);
                 break;
             case AudioDeviceInfo.TYPE_USB_DEVICE:
             case AudioDeviceInfo.TYPE_USB_HEADSET:
-                type = "USB";
+                type = uiText.get(UiText.Key.ROUTE_USB);
                 break;
             case AudioDeviceInfo.TYPE_HDMI:
             case AudioDeviceInfo.TYPE_HDMI_ARC:
-                type = "HDMI";
+                type = uiText.get(UiText.Key.ROUTE_HDMI);
                 break;
             case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER:
-                type = "Speaker";
+                type = uiText.get(UiText.Key.ROUTE_SPEAKER);
                 break;
             case AudioDeviceInfo.TYPE_BUILTIN_EARPIECE:
-                type = "Earpiece";
+                type = uiText.get(UiText.Key.ROUTE_EARPIECE);
                 break;
             default:
                 return null;
@@ -445,9 +538,9 @@ public final class DolbyControlService extends Service {
         }
         NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                "Dolby control",
+                uiText.get(UiText.Key.CHANNEL_NAME),
                 NotificationManager.IMPORTANCE_LOW);
-        channel.setDescription("Keeps the global Dolby DAP effect active");
+        channel.setDescription(uiText.get(UiText.Key.CHANNEL_DESCRIPTION));
         NotificationManager manager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.createNotificationChannel(channel);
@@ -466,8 +559,8 @@ public final class DolbyControlService extends Service {
                 : new Notification.Builder(this);
         return builder
                 .setSmallIcon(android.R.drawable.ic_media_play)
-                .setContentTitle("MD-PH-001 Dolby Atmos")
-                .setContentText("Global DAP controller is active")
+                .setContentTitle(uiText.get(UiText.Key.APP_TITLE))
+                .setContentText(uiText.get(UiText.Key.NOTIFICATION_ACTIVE))
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)
                 .setCategory(Notification.CATEGORY_SERVICE)
@@ -483,6 +576,7 @@ public final class DolbyControlService extends Service {
             }
             controller = null;
         }
+        lastDeviceMask = 0;
     }
 
     private static String profileKey(int profile, String name) {
@@ -637,6 +731,10 @@ public final class DolbyControlService extends Service {
 
         void refresh() {
             scheduleRefresh(false);
+        }
+
+        void restartAudioService() {
+            DolbyControlService.this.restartAudioService();
         }
 
         private void setProfileParameter(

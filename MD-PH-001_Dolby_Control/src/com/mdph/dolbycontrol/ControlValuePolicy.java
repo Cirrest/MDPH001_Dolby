@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 final class ControlValuePolicy {
     private ControlValuePolicy() {

@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

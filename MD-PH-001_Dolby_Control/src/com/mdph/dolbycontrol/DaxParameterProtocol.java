@@ -1,7 +1,8 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 final class DaxParameterProtocol {
     static final int EFFECT_PARAM_EFFECT_ENABLE = 0x00000000;
@@ -11,6 +12,7 @@ final class DaxParameterProtocol {
     static final int EFFECT_PARAM_PROFILE_NUM = 0x03000000;
     static final int EFFECT_PARAM_PROFILE_PARAMETER = 0x01000000;
     static final int EFFECT_PARAM_PROFILE_PORT_PARAMETER = 0x02000000;
+    static final int EFFECT_PARAM_ROUTE_SYNC = 0x4D445254;
 
     static final int PARAM_HEADPHONE_VIRTUALIZER = 0x65;
     static final int PARAM_SPEAKER_VIRTUALIZER = 0x66;
@@ -45,12 +47,33 @@ final class DaxParameterProtocol {
                 + (parameter << 16);
     }
 
+    static int tuningDeviceNameLengthKey(int port) {
+        return (port << 16) + 2;
+    }
+
+    static int selectedTuningDeviceKey(int port) {
+        return (port << 16) + EFFECT_PARAM_SELECTED_TUNING;
+    }
+
     static int valueCountForParameter(int parameter) {
         return parameter == PARAM_GEQ_BAND_GAINS ? 20 : 1;
     }
 
     static byte[] encodeParameterKey(int key) {
         return encodeInts(key);
+    }
+
+    static byte[] encodeRouteDevice(int deviceMask) {
+        return encodeInts(deviceMask);
+    }
+
+    static byte[] encodeSelectedTuningDevice(int port, String deviceId) {
+        byte[] id = deviceId.getBytes(StandardCharsets.UTF_8);
+        ByteBuffer buffer = ByteBuffer.allocate(4 + id.length)
+                .order(ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(port);
+        buffer.put(id);
+        return buffer.array();
     }
 
     static byte[] encodeBasicGetBuffer(int parameter) {
@@ -89,6 +112,14 @@ final class DaxParameterProtocol {
             values[i] = buffer.getInt();
         }
         return values;
+    }
+
+    static String decodeUtf8String(byte[] bytes, int offset) {
+        int end = offset;
+        while (end < bytes.length && bytes[end] != 0) {
+            end++;
+        }
+        return new String(bytes, offset, end - offset, StandardCharsets.UTF_8).trim();
     }
 
     private static byte[] encodeSet(int command, int[] selectors, int[] values) {

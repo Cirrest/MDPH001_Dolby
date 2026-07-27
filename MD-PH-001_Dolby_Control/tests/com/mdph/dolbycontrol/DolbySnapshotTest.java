@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 public final class DolbySnapshotTest {
     public static void main(String[] args) {

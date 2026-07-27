@@ -1,4 +1,4 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -23,6 +23,7 @@ final class GeqEditorView extends View {
 
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final int[] values = new int[GeqGainMapper.BAND_COUNT];
+    private MaterialColorScheme colors;
     private OnBandChangeListener listener;
     private int selectedBand = -1;
 
@@ -38,6 +39,11 @@ final class GeqEditorView extends View {
 
     void setOnBandChangeListener(OnBandChangeListener listener) {
         this.listener = listener;
+    }
+
+    void setColorScheme(MaterialColorScheme colors) {
+        this.colors = colors;
+        invalidate();
     }
 
     void setValues(int[] newValues) {
@@ -70,14 +76,17 @@ final class GeqEditorView extends View {
         float zeroY = top + plotHeight / 2f;
         float bandWidth = (right - left) / values.length;
 
-        paint.setColor(Color.rgb(247, 248, 250));
+        MaterialColorScheme scheme = colors == null
+                ? MaterialColorScheme.fallback(false)
+                : colors;
+        paint.setColor(scheme.surfaceContainer);
         canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()),
                 6f * density, 6f * density, paint);
 
         paint.setStrokeWidth(density);
         for (int db = -10; db <= 10; db += 5) {
             float y = dbToY(db, top, bottom);
-            paint.setColor(db == 0 ? Color.rgb(107, 114, 128) : Color.rgb(220, 224, 229));
+            paint.setColor(db == 0 ? scheme.outline : scheme.outlineVariant);
             canvas.drawLine(left, y, right, y, paint);
         }
 
@@ -86,8 +95,8 @@ final class GeqEditorView extends View {
             float barHalf = Math.max(2f * density, bandWidth * 0.27f);
             float valueY = dbToY(values[i], top, bottom);
             paint.setColor(values[i] >= 0
-                    ? Color.rgb(15, 118, 110)
-                    : Color.rgb(220, 93, 73));
+                    ? scheme.primary
+                    : scheme.error);
             float barTop = Math.min(zeroY, valueY);
             float barBottom = Math.max(zeroY, valueY);
             if (Math.abs(barBottom - barTop) < density) {
@@ -103,7 +112,7 @@ final class GeqEditorView extends View {
             if (i == selectedBand) {
                 paint.setStyle(Paint.Style.STROKE);
                 paint.setStrokeWidth(2f * density);
-                paint.setColor(Color.rgb(245, 158, 11));
+                paint.setColor(scheme.secondary);
                 canvas.drawRoundRect(
                         new RectF(
                                 center - bandWidth * 0.44f,
@@ -118,7 +127,7 @@ final class GeqEditorView extends View {
         }
 
         paint.setTextSize(9f * getResources().getDisplayMetrics().scaledDensity);
-        paint.setColor(Color.rgb(75, 85, 99));
+        paint.setColor(scheme.onSurfaceVariant);
         paint.setTextAlign(Paint.Align.CENTER);
         int[] labels = {0, 4, 8, 12, 16, 19};
         for (int index : labels) {

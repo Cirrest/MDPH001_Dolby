@@ -1,8 +1,10 @@
-package com.codex.dolbycontrol;
+package com.mdph.dolbycontrol;
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
+import android.graphics.Typeface;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -20,22 +23,22 @@ import android.widget.SeekBar;
 import android.widget.Space;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Locale;
 
 public final class MainActivity extends Activity implements DolbyControlService.Listener {
-    private static final int COLOR_TEXT = Color.rgb(31, 41, 55);
-    private static final int COLOR_MUTED = Color.rgb(107, 114, 128);
-    private static final int COLOR_PRIMARY = Color.rgb(15, 118, 110);
-    private static final int COLOR_ACCENT = Color.rgb(245, 158, 11);
-    private static final int COLOR_ERROR = Color.rgb(190, 61, 55);
-
     private DolbyControlService.LocalBinder service;
     private boolean bound;
     private boolean rendering;
+    private UiText uiText;
+    private MaterialColorScheme colors;
 
     private TextView statusDot;
     private TextView statusText;
     private TextView routeText;
     private TextView tuningText;
+    private final Button[] themeButtons = new Button[3];
     private Switch enabledSwitch;
     private final Button[] modeButtons = new Button[4];
     private final Button[] ieqButtons = new Button[4];
@@ -72,8 +75,9 @@ public final class MainActivity extends Activity implements DolbyControlService.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setStatusBarColor(Color.rgb(250, 250, 250));
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        uiText = UiText.forLanguageTag(Locale.getDefault().toLanguageTag());
+        colors = createColorScheme();
+        applySystemBars();
         buildUi();
         Intent serviceIntent = new Intent(this, DolbyControlService.class);
         if (Build.VERSION.SDK_INT >= 26) {
@@ -108,7 +112,7 @@ public final class MainActivity extends Activity implements DolbyControlService.
     private void buildUi() {
         ScrollView scroll = new ScrollView(this);
         scroll.setFillViewport(true);
-        scroll.setBackgroundColor(Color.rgb(250, 250, 250));
+        scroll.setBackgroundColor(colors.surface);
 
         LinearLayout content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
@@ -117,7 +121,7 @@ public final class MainActivity extends Activity implements DolbyControlService.
                 ScrollView.LayoutParams.MATCH_PARENT,
                 ScrollView.LayoutParams.WRAP_CONTENT));
 
-        TextView title = text("Dolby Atmos", 28, COLOR_TEXT);
+        TextView title = text(uiText.get(UiText.Key.APP_TITLE), 28, colors.onSurface);
         title.setGravity(Gravity.START);
         content.addView(title, matchWrap());
 
@@ -125,14 +129,37 @@ public final class MainActivity extends Activity implements DolbyControlService.
         statusRow.setOrientation(LinearLayout.HORIZONTAL);
         statusRow.setGravity(Gravity.CENTER_VERTICAL);
         statusRow.setPadding(0, dp(6), 0, dp(18));
-        statusDot = text("\u25cf", 14, COLOR_ERROR);
-        statusText = text("\u6b63\u5728\u8fde\u63a5", 14, COLOR_MUTED);
+        statusDot = text("\u25cf", 14, colors.error);
+        statusText = text(uiText.get(UiText.Key.CONNECTING), 14, colors.onSurfaceVariant);
         statusRow.addView(statusDot, wrapWrap());
         statusRow.addView(space(dp(8), 1));
         statusRow.addView(statusText, wrapWrap());
         content.addView(statusRow, matchWrap());
 
-        enabledSwitch = rowSwitch("\u5168\u5c40 Dolby \u5904\u7406");
+        addSectionTitle(content, uiText.get(UiText.Key.THEME));
+        LinearLayout themes = segmentRow();
+        String[] themeNames = {
+                uiText.get(UiText.Key.THEME_LIGHT),
+                uiText.get(UiText.Key.THEME_DARK),
+                uiText.get(UiText.Key.THEME_SYSTEM)};
+        for (int i = 0; i < themeButtons.length; i++) {
+            final int theme = i == 0
+                    ? ThemePolicy.THEME_LIGHT
+                    : (i == 1 ? ThemePolicy.THEME_DARK : ThemePolicy.THEME_SYSTEM);
+            themeButtons[i] = segmentButton(themeNames[i]);
+            themeButtons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getPreferences(MODE_PRIVATE).edit()
+                            .putInt("theme", theme).apply();
+                    recreate();
+                }
+            });
+            themes.addView(themeButtons[i], weightedButton());
+        }
+        content.addView(themes, matchWrap());
+
+        enabledSwitch = rowSwitch(uiText.get(UiText.Key.GLOBAL_PROCESSING));
         enabledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -144,9 +171,13 @@ public final class MainActivity extends Activity implements DolbyControlService.
         content.addView(enabledSwitch, matchWrap());
 
         addDivider(content);
-        addSectionTitle(content, "\u6a21\u5f0f");
+        addSectionTitle(content, uiText.get(UiText.Key.MODE));
         LinearLayout modes = segmentRow();
-        String[] modeNames = {"\u52a8\u6001", "\u7535\u5f71", "\u97f3\u4e50", "\u81ea\u5b9a\u4e49"};
+        String[] modeNames = {
+                uiText.get(UiText.Key.MODE_DYNAMIC),
+                uiText.get(UiText.Key.MODE_MOVIE),
+                uiText.get(UiText.Key.MODE_MUSIC),
+                uiText.get(UiText.Key.MODE_CUSTOM)};
         for (int i = 0; i < modeButtons.length; i++) {
             final int mode = i;
             modeButtons[i] = segmentButton(modeNames[i]);
@@ -162,16 +193,20 @@ public final class MainActivity extends Activity implements DolbyControlService.
         }
         content.addView(modes, matchWrap());
 
-        routeText = text("\u8f93\u51fa\uff1a-", 14, COLOR_TEXT);
+        routeText = text(uiText.get(UiText.Key.OUTPUT) + ": -", 14, colors.onSurface);
         routeText.setPadding(0, dp(14), 0, dp(4));
         content.addView(routeText, matchWrap());
-        tuningText = text("Tuning\uff1a-", 13, COLOR_MUTED);
+        tuningText = text(uiText.get(UiText.Key.TUNING) + ": -", 13, colors.onSurfaceVariant);
         content.addView(tuningText, matchWrap());
 
         addDivider(content);
-        addSectionTitle(content, "\u667a\u80fd\u5747\u8861");
+        addSectionTitle(content, uiText.get(UiText.Key.INTELLIGENT_EQUALIZER));
         LinearLayout ieq = segmentRow();
-        String[] ieqNames = {"\u5173", "\u5e73\u8861", "\u6e29\u6696", "\u7ec6\u8282"};
+        String[] ieqNames = {
+                uiText.get(UiText.Key.OFF),
+                uiText.get(UiText.Key.IEQ_BALANCED),
+                uiText.get(UiText.Key.IEQ_WARM),
+                uiText.get(UiText.Key.IEQ_DETAILED)};
         for (int i = 0; i < ieqButtons.length; i++) {
             final int preset = i;
             ieqButtons[i] = segmentButton(ieqNames[i]);
@@ -188,8 +223,8 @@ public final class MainActivity extends Activity implements DolbyControlService.
         content.addView(ieq, matchWrap());
 
         addDivider(content);
-        addSectionTitle(content, "\u5bf9\u8bdd\u589e\u5f3a");
-        dialogSwitch = rowSwitch("\u5bf9\u8bdd\u589e\u5f3a");
+        addSectionTitle(content, uiText.get(UiText.Key.DIALOG_ENHANCEMENT));
+        dialogSwitch = rowSwitch(uiText.get(UiText.Key.DIALOG_ENHANCEMENT));
         dialogSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -224,20 +259,20 @@ public final class MainActivity extends Activity implements DolbyControlService.
             }
         });
         dialogAmountRow.addView(dialogSeek, new LinearLayout.LayoutParams(0, dp(42), 1f));
-        dialogValue = text("0", 15, COLOR_TEXT);
+        dialogValue = text("0", 15, colors.onSurface);
         dialogValue.setGravity(Gravity.CENTER);
         dialogAmountRow.addView(dialogValue, new LinearLayout.LayoutParams(dp(42), dp(42)));
         content.addView(dialogAmountRow, matchWrap());
 
         addDivider(content);
-        addSectionTitle(content, "\u97f3\u573a");
-        levelerSwitch = rowSwitch("\u97f3\u91cf\u5747\u8861");
+        addSectionTitle(content, uiText.get(UiText.Key.SOUNDSTAGE));
+        levelerSwitch = rowSwitch(uiText.get(UiText.Key.VOLUME_LEVELER));
         levelerSwitch.setOnCheckedChangeListener(toggleListener(0));
         content.addView(levelerSwitch, matchWrap());
-        headphoneSwitch = rowSwitch("\u8033\u673a\u865a\u62df\u5316");
+        headphoneSwitch = rowSwitch(uiText.get(UiText.Key.HEADPHONE_VIRTUALIZER));
         headphoneSwitch.setOnCheckedChangeListener(toggleListener(1));
         content.addView(headphoneSwitch, matchWrap());
-        speakerSwitch = rowSwitch("\u626c\u58f0\u5668\u865a\u62df\u5316");
+        speakerSwitch = rowSwitch(uiText.get(UiText.Key.SPEAKER_VIRTUALIZER));
         speakerSwitch.setOnCheckedChangeListener(toggleListener(2));
         content.addView(speakerSwitch, matchWrap());
 
@@ -245,15 +280,16 @@ public final class MainActivity extends Activity implements DolbyControlService.
         LinearLayout geqHeader = new LinearLayout(this);
         geqHeader.setOrientation(LinearLayout.HORIZONTAL);
         geqHeader.setGravity(Gravity.CENTER_VERTICAL);
-        TextView geqTitle = text("20 \u6bb5\u56fe\u5f62\u5747\u8861", 18, COLOR_TEXT);
+        TextView geqTitle = text(uiText.get(UiText.Key.GRAPHIC_EQUALIZER_20), 18, colors.onSurface);
         geqHeader.addView(geqTitle, new LinearLayout.LayoutParams(0, dp(48), 1f));
         Button reset = new Button(this);
-        reset.setText("\u6e05\u96f6");
+        reset.setText(uiText.get(UiText.Key.RESET));
         reset.setTextSize(13);
         reset.setAllCaps(false);
         reset.setMinWidth(0);
         reset.setMinimumWidth(0);
-        reset.setBackground(buttonBackground(Color.rgb(243, 244, 246), Color.rgb(209, 213, 219)));
+        reset.setTextColor(colors.onSurface);
+        reset.setBackground(buttonBackground(colors.surfaceContainerHigh, colors.outlineVariant));
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -267,7 +303,7 @@ public final class MainActivity extends Activity implements DolbyControlService.
 
         geqControls = new LinearLayout(this);
         geqControls.setOrientation(LinearLayout.VERTICAL);
-        geqSwitch = rowSwitch("\u542f\u7528\u81ea\u5b9a\u4e49\u5747\u8861");
+        geqSwitch = rowSwitch(uiText.get(UiText.Key.ENABLE_CUSTOM_EQUALIZER));
         geqSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -277,10 +313,11 @@ public final class MainActivity extends Activity implements DolbyControlService.
             }
         });
         geqControls.addView(geqSwitch, matchWrap());
-        geqSelection = text("47 Hz   0 dB", 14, COLOR_MUTED);
+        geqSelection = text("47 Hz   0 dB", 14, colors.onSurfaceVariant);
         geqSelection.setPadding(0, dp(8), 0, dp(4));
         geqControls.addView(geqSelection, matchWrap());
         geqEditor = new GeqEditorView(this);
+        geqEditor.setColorScheme(colors);
         geqEditor.setOnBandChangeListener(new GeqEditorView.OnBandChangeListener() {
             @Override
             public void onBandChanged(int band, int db) {
@@ -296,6 +333,42 @@ public final class MainActivity extends Activity implements DolbyControlService.
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(236)));
         content.addView(geqControls, matchWrap());
+
+        addDivider(content);
+        addSectionTitle(content, uiText.get(UiText.Key.MAINTENANCE));
+        final Button restartAudio = new Button(this);
+        restartAudio.setText(uiText.get(UiText.Key.RESTART_AUDIO_SERVICE));
+        restartAudio.setTextSize(15);
+        restartAudio.setAllCaps(false);
+        restartAudio.setCompoundDrawablesWithIntrinsicBounds(
+                android.R.drawable.ic_popup_sync, 0, 0, 0);
+        restartAudio.setCompoundDrawablePadding(dp(8));
+        restartAudio.setTextColor(colors.onSurface);
+        restartAudio.setBackground(buttonBackground(
+                colors.surfaceContainerHigh, colors.outlineVariant));
+        restartAudio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (service == null) {
+                    return;
+                }
+                service.restartAudioService();
+                restartAudio.setEnabled(false);
+                restartAudio.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        restartAudio.setEnabled(true);
+                    }
+                }, 3000L);
+                Toast.makeText(
+                        MainActivity.this,
+                        uiText.get(UiText.Key.RESTART_REQUESTED),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+        content.addView(restartAudio, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(48)));
 
         setContentView(scroll);
     }
@@ -321,22 +394,28 @@ public final class MainActivity extends Activity implements DolbyControlService.
     private void render(DolbySnapshot value) {
         rendering = true;
         try {
-            statusDot.setTextColor(value.connected && value.hasControl ? COLOR_PRIMARY : COLOR_ERROR);
+            statusDot.setTextColor(value.connected && value.hasControl
+                    ? statusConnected() : statusDisconnected());
             if (value.connected && value.hasControl) {
                 statusText.setText(value.enabled
-                        ? "\u5df2\u8fde\u63a5\uff0c\u5904\u7406\u5f00\u542f"
-                        : "\u5df2\u8fde\u63a5\uff0c\u5904\u7406\u5173\u95ed");
+                        ? uiText.get(UiText.Key.CONNECTED_ENABLED)
+                        : uiText.get(UiText.Key.CONNECTED_DISABLED));
             } else {
                 statusText.setText(value.lastError.length() == 0
-                        ? "\u6b63\u5728\u8fde\u63a5"
+                        ? uiText.get(UiText.Key.CONNECTING)
                         : value.lastError);
             }
             enabledSwitch.setChecked(value.enabled);
-            routeText.setText("\u8f93\u51fa\uff1a" + value.outputRoute);
-            tuningText.setText("Tuning\uff1a" + value.tuningStatus
-                    + "   \u97f3\u91cf " + value.volume + "/" + value.maxVolume);
+            routeText.setText(uiText.get(UiText.Key.OUTPUT) + ": " + value.outputRoute);
+            tuningText.setText(uiText.get(UiText.Key.TUNING) + ": " + value.tuningStatus
+                    + "   " + uiText.get(UiText.Key.VOLUME) + " "
+                    + value.volume + "/" + value.maxVolume);
             setSegmentSelection(modeButtons, value.mode);
             setSegmentSelection(ieqButtons, ControlValuePolicy.sanitizeIeq(value.ieq));
+            int selectedTheme = ThemePolicy.sanitize(getPreferences(MODE_PRIVATE)
+                    .getInt("theme", ThemePolicy.THEME_SYSTEM));
+            setSegmentSelection(themeButtons,
+                    selectedTheme == ThemePolicy.THEME_SYSTEM ? 2 : selectedTheme - 1);
             dialogSwitch.setChecked(value.dialogEnabled);
             dialogSeek.setProgress(ControlValuePolicy.sanitizeDialogAmount(value.dialogAmount));
             dialogValue.setText(String.valueOf(value.dialogAmount));
@@ -370,22 +449,23 @@ public final class MainActivity extends Activity implements DolbyControlService.
     private void setSegmentSelection(Button[] buttons, int selected) {
         for (int i = 0; i < buttons.length; i++) {
             boolean active = i == selected;
-            buttons[i].setTextColor(active ? Color.WHITE : COLOR_TEXT);
+            buttons[i].setTextColor(active ? colors.onPrimaryContainer : colors.onSurface);
+            buttons[i].setTypeface(Typeface.DEFAULT, active ? Typeface.BOLD : Typeface.NORMAL);
             buttons[i].setBackground(buttonBackground(
-                    active ? COLOR_PRIMARY : Color.rgb(243, 244, 246),
-                    active ? COLOR_PRIMARY : Color.rgb(209, 213, 219)));
+                    active ? colors.primaryContainer : colors.surfaceContainerHigh,
+                    active ? colors.primary : colors.outlineVariant));
         }
     }
 
     private void addSectionTitle(LinearLayout parent, String title) {
-        TextView view = text(title, 18, COLOR_TEXT);
+        TextView view = text(title, 18, colors.onSurface);
         view.setPadding(0, 0, 0, dp(10));
         parent.addView(view, matchWrap());
     }
 
     private void addDivider(LinearLayout parent) {
         View divider = new View(this);
-        divider.setBackgroundColor(Color.rgb(226, 229, 233));
+        divider.setBackgroundColor(colors.outlineVariant);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(1));
@@ -397,7 +477,8 @@ public final class MainActivity extends Activity implements DolbyControlService.
         Switch control = new Switch(this);
         control.setText(label);
         control.setTextSize(16);
-        control.setTextColor(COLOR_TEXT);
+        control.setTextColor(colors.onSurface);
+        control.setButtonTintList(switchTintList());
         control.setGravity(Gravity.CENTER_VERTICAL);
         control.setMinHeight(dp(48));
         return control;
@@ -419,6 +500,8 @@ public final class MainActivity extends Activity implements DolbyControlService.
         button.setMinWidth(0);
         button.setMinimumWidth(0);
         button.setPadding(dp(4), 0, dp(4), 0);
+        button.setMinHeight(dp(48));
+        button.setStateListAnimator(null);
         return button;
     }
 
@@ -465,5 +548,61 @@ public final class MainActivity extends Activity implements DolbyControlService.
 
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private MaterialColorScheme createColorScheme() {
+        boolean systemDark = MaterialColorScheme.isDarkMode(
+                getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK);
+        boolean dark = ThemePolicy.isDark(
+                getPreferences(MODE_PRIVATE).getInt("theme", ThemePolicy.THEME_SYSTEM), systemDark);
+        if (Build.VERSION.SDK_INT < 31) {
+            return MaterialColorScheme.fallback(dark);
+        }
+        return MaterialColorScheme.dynamic(dark, new MaterialColorScheme.DynamicColorSource() {
+            @Override
+            public int resolve(String name, int fallback) {
+                try {
+                    int id = getResources().getIdentifier(name, "color", "android");
+                    return id == 0 ? fallback : getColor(id);
+                } catch (RuntimeException ignored) {
+                    return fallback;
+                }
+            }
+        });
+    }
+
+    private void applySystemBars() {
+        getWindow().setStatusBarColor(colors.surface);
+        getWindow().setNavigationBarColor(colors.surface);
+        int flags = getWindow().getDecorView().getSystemUiVisibility();
+        if (colors.dark) {
+            flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) {
+                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+        } else {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            if (Build.VERSION.SDK_INT >= 26) {
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            }
+        }
+        getWindow().getDecorView().setSystemUiVisibility(flags);
+    }
+
+    private ColorStateList switchTintList() {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_checked },
+                new int[] {}
+        };
+        int[] values = new int[] { colors.primary, colors.outline };
+        return new ColorStateList(states, values);
+    }
+
+    private int statusConnected() {
+        return colors.dark ? 0xff81c784 : 0xff2e7d32;
+    }
+
+    private int statusDisconnected() {
+        return colors.dark ? 0xffef9a9a : 0xffc62828;
     }
 }
