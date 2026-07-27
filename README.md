@@ -1,6 +1,6 @@
 # 水月雨MD-PH-001 DolbyAtmos模块
 ***
-适配水月雨MD-PH-001
+适配水月雨MAID01(MD-PH-001)设备
 ***
 
 水月雨不按GPL协议开源kernel，没招就自己逆向这个设备kernel、odm、vendor，这个算是自己逆向半年多的成果之一，也算是自己弥补了这个水月雨手机HiFi音乐里面没有杜比全景声的最大遗憾（自认为）</br>
@@ -32,3 +32,9 @@
 ###  *安全保证* 
 ***
 该模块保证不含格机脚本、远程遥测等危险操作/后门，安装前请核对SHA256及MD5以免刷到非本人制作模块。</br>
+<img width="3240" height="2400" alt="im1" src="https://github.com/user-attachments/assets/aaa9dceb-9c35-49e2-89b0-72a82a7e4974" />
+<img width="2886" height="1080" alt="im2" src="https://github.com/user-attachments/assets/54bd50c9-548c-4796-83e3-d409d8ce10bb" />
+<img width="1152" height="1152" alt="打赏作者，万分感谢" src="https://github.com/user-attachments/assets/456e042d-d526-4d44-825c-d702fa3167ff" />
+
+---
+[控制器使用Material Design 3(Material You)风格设计](https://m3.material.io/)
