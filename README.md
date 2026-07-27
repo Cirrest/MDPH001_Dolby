@@ -1,6 +1,6 @@
 # 水月雨MD-PH-001 DolbyAtmos模块
 ***
-适配水月雨MAID01(MD-PH-001)设备
+适配 Moondrop MAID 01 (MD-PH-001) 设备
 ***
 
 水月雨不按GPL协议开源kernel，没招就自己逆向这个设备kernel、odm、vendor，这个算是自己逆向半年多的成果之一，也算是自己弥补了这个水月雨手机HiFi音乐里面没有杜比全景声的最大遗憾（自认为）</br>
