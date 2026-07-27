@@ -1,17 +1,14 @@
 #!/system/bin/sh
 
 EXPECTED_DEVICE="MD_PH_001"
-EXPECTED_FINGERPRINT="MOONDROP/MD_PH_001/MD_PH_001:14/UP1A.231005.007/1764183053:user/release-keys"
+EXPECTED_ANDROID="14"
 
 DEVICE="$(getprop ro.product.device)"
-FINGERPRINT="$(getprop ro.build.fingerprint)"
+ANDROID_VERSION="$(getprop ro.build.version.release)"
 
 ui_print "- 安装前的设备兼容检查"
-ui_print "- Checking the target device"
-[ "$DEVICE" = "$EXPECTED_DEVICE" ] || abort "Unsupported device: $DEVICE"
-[ "$FINGERPRINT" = "$EXPECTED_FINGERPRINT" ] || abort "Unsupported build fingerprint: $FINGERPRINT"
-[ "$ARCH" = "arm64" ] || abort "Unsupported architecture: $ARCH"
-[ "$API" -eq 34 ] || abort "Unsupported Android API: $API"
+[ "$DEVICE" = "$EXPECTED_DEVICE" ] || abort "不受支持的设备: $DEVICE"
+[ "$ANDROID_VERSION" = "$EXPECTED_ANDROID" ] || abort "不受支持的Android版本: $ANDROID_VERSION"
 
 ui_print "- ✔设备检查通过，进行安装"
 ui_print "- "
@@ -19,7 +16,7 @@ ui_print "- "
 ui_print "- "
 ui_print "- 该模块安装以下为MD-PH-001适配的DolbyAtmos服务及依赖"
 ui_print "- AC-3, E-AC-3 ， AC-4 音频解码器"
-ui_print "- DMS、DXP服务, DAP控制器及游戏DAP等"
+ui_print "- DMS、DXP服务, DAP控制器、私有NDK库等"
 ui_print "- DVL服务会正常注册，但不会自动附加到该音频框架。(省的全局SRC绕过这特色功能没了)"
 ui_print "- "
 ui_print "- "

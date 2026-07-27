@@ -2,10 +2,10 @@
 
 MODDIR=${0%/*}
 EXPECTED_DEVICE="MD_PH_001"
-EXPECTED_FINGERPRINT="MOONDROP/MD_PH_001/MD_PH_001:14/UP1A.231005.007/1764183053:user/release-keys"
+EXPECTED_ANDROID="14"
 
 if [ "$(getprop ro.product.device)" != "$EXPECTED_DEVICE" ] ||
-   [ "$(getprop ro.build.fingerprint)" != "$EXPECTED_FINGERPRINT" ]; then
+   [ "$(getprop ro.build.version.release)" != "$EXPECTED_ANDROID" ]; then
     touch "$MODDIR/disable"
     exit 0
 fi

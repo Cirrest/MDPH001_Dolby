@@ -2,10 +2,10 @@
 
 MODDIR=${0%/*}
 EXPECTED_DEVICE="MD_PH_001"
-EXPECTED_FINGERPRINT="MOONDROP/MD_PH_001/MD_PH_001:14/UP1A.231005.007/1764183053:user/release-keys"
+EXPECTED_ANDROID="14"
 
 if [ "$(getprop ro.product.device)" != "$EXPECTED_DEVICE" ] ||
-   [ "$(getprop ro.build.fingerprint)" != "$EXPECTED_FINGERPRINT" ]; then
+   [ "$(getprop ro.build.version.release)" != "$EXPECTED_ANDROID" ]; then
     touch "$MODDIR/disable"
     exit 0
 fi
@@ -52,6 +52,16 @@ wait_for_codec2() {
     return 1
 }
 
+handle_audio_restart_requests() {
+    for request in /data/user/*/com.cirrest.dolbycontrol.mdph001/files/restart_audio_service.request; do
+        [ -f "$request" ] || continue
+        rm -f "$request"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') restarting audioserver for $request" \
+            >>"$LOGDIR/audio-restart.log"
+        setprop ctl.restart audioserver
+    done
+}
+
 if ! pidof vendor.dolby.dms.service >/dev/null 2>&1; then
     start_dms
 fi
@@ -66,18 +76,25 @@ if wait_for_codec2; then
     setprop ctl.restart media
 fi
 
+watchdog_ticks=5
 while true; do
-    if ! pidof vendor.dolby.dms.service >/dev/null 2>&1; then
-        start_dms
-        wait_for_dms
-    fi
+    handle_audio_restart_requests
 
-    if ! pidof vendor.dolby_sp.media.c2@1.0-service >/dev/null 2>&1; then
-        start_codec2
-        if wait_for_codec2; then
-            setprop ctl.restart media
+    watchdog_ticks=$((watchdog_ticks + 1))
+    if [ "$watchdog_ticks" -ge 5 ]; then
+        watchdog_ticks=0
+        if ! pidof vendor.dolby.dms.service >/dev/null 2>&1; then
+            start_dms
+            wait_for_dms
+        fi
+
+        if ! pidof vendor.dolby_sp.media.c2@1.0-service >/dev/null 2>&1; then
+            start_codec2
+            if wait_for_codec2; then
+                setprop ctl.restart media
+            fi
         fi
     fi
 
-    sleep 10
+    sleep 2
 done
