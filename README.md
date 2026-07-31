@@ -34,8 +34,8 @@
 ***
 该模块保证不含格机脚本、远程遥测等危险操作/后门，安装前请核对SHA256及MD5以免刷到非本人制作模块。</br>
 ---
-<img width="3240" height="2400" alt="im1" src="https://github.com/user-attachments/assets/aaa9dceb-9c35-49e2-89b0-72a82a7e4974" />
-<img width="2886" height="1080" alt="im2" src="https://github.com/user-attachments/assets/54bd50c9-548c-4796-83e3-d409d8ce10bb" />
+<img width="810" height="600" alt="im1" src="https://github.com/user-attachments/assets/aaa9dceb-9c35-49e2-89b0-72a82a7e4974" />
+<img width="721" height="270" alt="im2" src="https://github.com/user-attachments/assets/54bd50c9-548c-4796-83e3-d409d8ce10bb" />
 <img width="350" height="350" alt="打赏作者，万分感谢" src="https://github.com/user-attachments/assets/456e042d-d526-4d44-825c-d702fa3167ff" />
 
 ---
