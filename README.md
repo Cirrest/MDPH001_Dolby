@@ -35,7 +35,7 @@
 ---
 <img width="3240" height="2400" alt="im1" src="https://github.com/user-attachments/assets/aaa9dceb-9c35-49e2-89b0-72a82a7e4974" />
 <img width="2886" height="1080" alt="im2" src="https://github.com/user-attachments/assets/54bd50c9-548c-4796-83e3-d409d8ce10bb" />
-<img width="1152" height="1152" alt="打赏作者，万分感谢" src="https://github.com/user-attachments/assets/456e042d-d526-4d44-825c-d702fa3167ff" />
+<img width="800" height="800" alt="打赏作者，万分感谢" src="https://github.com/user-attachments/assets/456e042d-d526-4d44-825c-d702fa3167ff" />
 
 ---
 [控制器使用Material Design 3(Material You)风格设计](https://m3.material.io/)
