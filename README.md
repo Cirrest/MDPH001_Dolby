@@ -13,6 +13,7 @@
 4.已做兼容性处理，适配100级音量调节及曲线，可与原厂AudioConsloe同开同用，DAP音效控制器内全局Dolby处理关闭后即可恢复原厂全局SRC绕过。</br>
 5.扬声器、3.5mm、4.4mm、蓝牙均可享受DolbyAtmos输出。</br>
 
+[适配MAID 01 DolbyVison模块](https://github.com/Cirrest/MDPH001_DolbyVison/)</br>
 ###  *要求* 
 ***
 1.设备必须为水月雨MD-PH-001原厂ROM并已修补好Magisk。</br>
