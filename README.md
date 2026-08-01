@@ -8,10 +8,11 @@
 ###  *模块内容* 
 ***
 1.手搓DMS/DAX基础音频服务、DAP音效控制器。</br>
-2.添加Dolby AC-4/AC-3/E-AC3音频解码器，可亮标并处理输出AppleMusic、QQ音乐、哔哩哔哩、iQIYI等软件的杜比全景声音频</br>
+2.添加Dolby AC-4/AC-3/E-AC3/E-AC3-JOC音频解码器，可亮标并处理输出AppleMusic、QQ音乐、哔哩哔哩、iQIYI等软件的杜比全景声音频</br>
 3.移植并适调iPad同款DolbyAtmos双耳空间渲染，闻所未闻的感染力，极为震撼。</br>
 4.已做兼容性处理，适配100级音量调节及曲线，可与原厂AudioConsloe同开同用，DAP音效控制器内全局Dolby处理关闭后即可恢复原厂全局SRC绕过。</br>
 5.扬声器、3.5mm、4.4mm、蓝牙均可享受DolbyAtmos输出。</br>
+6.杜比处理支持44.1khz-384khz采样的同采样输入输出。</br>
 
 [适配MAID 01 DolbyVison模块](https://github.com/Cirrest/MDPH001_DolbyVison/)</br>
 ###  *要求* 
@@ -23,7 +24,7 @@
 ###  *注意* 
 ***
 1.杜比全景声控制软件为MD-PH-001 Dolby Control</br>
-2.打开Dolby全局处理后，全局音频输出将会以16bit/24bit自适应位深-48Khz PCM输出，关闭即可恢复原厂全局SRC绕过</br>
+2.打开Dolby全局处理后，全局音频输出支持44.1khz-384khz采样的同采样输入输出(高采样/位深可能会大量占用系统资源），关闭即可恢复原厂全局SRC绕过</br>
 3.可随时播放AC4/AC3/E-AC3编码音频，不受Dolby全局处理开关限制（前提软件调用系统音频解码器）。播放该编码音频将会使用音频编码声明的音频模式均衡器，不使用Dolby Control内设定的自定义音频模式均衡器。</br>
 4.尽量不要装其它的音频模块，以免冲突</br>
 5.涉及杜比认证原因，仅模块本身及自制DolbyControl进行GPL开源，不涉及Dolby、编码器开源。</br>
