@@ -1532,7 +1532,7 @@
       </endpoint_type>
     </data>
   </profile>
-  <tuning name="speaker_music_vol3" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_music_vol3" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_music_vol3" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_music_vol3" endpoint_port="internal_speaker"/>
     <device_id id="default_internal_speaker" endpoint_port="internal_speaker"/>
@@ -1635,7 +1635,7 @@
       <bass-mbdrc-enable value="true"/>
     </data>
   </tuning>
-  <tuning name="speaker_music_vol2" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_music_vol2" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_music_vol2" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_music_vol2" endpoint_port="internal_speaker"/>
     <data>
@@ -1737,7 +1737,7 @@
       <bass-mbdrc-enable value="true"/>
     </data>
   </tuning>
-  <tuning name="speaker_music_vol1" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_music_vol1" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_music_vol1" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_music_vol1" endpoint_port="internal_speaker"/>
     <data>
@@ -1839,7 +1839,7 @@
       <bass-mbdrc-enable value="true"/>
     </data>
   </tuning>
-  <tuning name="speaker_movie_vol3" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_movie_vol3" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_movie_vol3" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_movie_vol3" endpoint_port="internal_speaker"/>
     <data>
@@ -1941,7 +1941,7 @@
       <bass-mbdrc-enable value="true"/>
     </data>
   </tuning>
-  <tuning name="speaker_movie_vol2" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_movie_vol2" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_movie_vol2" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_movie_vol2" endpoint_port="internal_speaker"/>
     <data>
@@ -2043,7 +2043,7 @@
       <bass-mbdrc-enable value="true"/>
     </data>
   </tuning>
-  <tuning name="speaker_movie_vol1" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_movie_vol1" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_movie_vol1" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_movie_vol1" endpoint_port="internal_speaker"/>
     <data>
@@ -2145,7 +2145,7 @@
       <bass-mbdrc-enable value="true"/>
     </data>
   </tuning>
-  <tuning name="speaker_FPS" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_FPS" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_portrait_game1" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_landscape_game1" endpoint_port="internal_speaker"/>
     <data>
@@ -2247,7 +2247,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="speaker_MOBA_vol3" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_MOBA_vol3" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_landscape_game2_vol3" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_portrait_game2_vol3" endpoint_port="internal_speaker"/>
     <data>
@@ -2349,7 +2349,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="speaker_MOBA_vol2" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_MOBA_vol2" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_landscape_game2_vol2" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_portrait_game2_vol2" endpoint_port="internal_speaker"/>
     <data>
@@ -2451,7 +2451,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="speaker_MOBA_vol1" endpoint_type="speaker" mono_device="false" tuned_rate="48000" orientation="1" output_channels="2">
+  <tuning name="speaker_MOBA_vol1" endpoint_type="speaker" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="1" output_channels="2">
     <device_id id="default_speaker_landscape_game2_vol1" endpoint_port="internal_speaker"/>
     <device_id id="default_speaker_portrait_game2_vol1" endpoint_port="internal_speaker"/>
     <data>
@@ -2553,7 +2553,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="default_headphone" endpoint_port="headphone" />
     <device_id id="default_headphone" endpoint_port="usb"/>
     <device_id id="default_usb" endpoint_port="usb"/>
@@ -2648,7 +2648,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_MH139" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_MH139" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="headphone_MH139" endpoint_port="usb"/>
     <data>
       <audio-optimizer-bands>
@@ -2741,7 +2741,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_MH147" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_MH147" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="headphone_MH148" endpoint_port="usb"/>
     <device_id id="headphone_MH147" endpoint_port="usb"/>
     <data>
@@ -2835,7 +2835,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_MH150" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_MH150" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="headphone_MH150" endpoint_port="usb"/>
     <data>
       <audio-optimizer-bands>
@@ -2928,7 +2928,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_yiner2T" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_yiner2T" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="headphone_yiner2T" endpoint_port="usb"/>
     <data>
       <audio-optimizer-bands>
@@ -3021,7 +3021,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Ofree" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Ofree" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_Ofree" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3114,7 +3114,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_X19E2" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_X19E2" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_X19E2" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3207,7 +3207,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_X19E3" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_X19E3" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_X19E3" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3300,7 +3300,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Enco" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Enco" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_W51" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3393,7 +3393,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_EncoX" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_EncoX" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_E7" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3486,7 +3486,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_yuner1" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_yuner1" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_yuner1" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3579,7 +3579,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_yuner2" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_yuner2" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_yuner2" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3672,7 +3672,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_yunerz" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_yunerz" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_yunerz" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3765,7 +3765,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Buds" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Buds" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_EE172" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3858,7 +3858,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_BudsZ" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_BudsZ" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_EF178" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -3951,7 +3951,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_hongdou" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_hongdou" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_hongdou" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4044,7 +4044,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_BudsWireless2" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_BudsWireless2" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_BudsWireless2" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4137,7 +4137,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Air3" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Air3" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_Air3" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4230,7 +4230,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Q2s" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Q2s" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_Q2s" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4323,7 +4323,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Budspro2_BEON" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Budspro2_BEON" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_Budspro2_beon" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4416,7 +4416,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_OPLUS_Budspro2_BEOFF" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_OPLUS_Budspro2_BEOFF" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="bluetooth_Budspro2_beoff" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4509,7 +4509,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="headphone_default_bluetooth" endpoint_type="headphone" mono_device="false" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="headphone_default_bluetooth" endpoint_type="headphone" mono_device="false" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="default_bluetooth" endpoint_port="bluetooth"/>
     <data>
       <audio-optimizer-bands>
@@ -4602,7 +4602,7 @@
       <bass-mbdrc-enable value="false"/>
     </data>
   </tuning>
-  <tuning name="unknown" endpoint_type="other" mono_device="true" tuned_rate="48000" orientation="2" output_channels="2">
+  <tuning name="unknown" endpoint_type="other" mono_device="true" tuned_rate="44100,48000,88200,96000,192000,384000" orientation="2" output_channels="2">
     <device_id id="default_hdmi" endpoint_port="hdmi"/>
     <device_id id="default_miracast" endpoint_port="miracast"/>
     <data>

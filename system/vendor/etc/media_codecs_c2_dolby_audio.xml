@@ -5,13 +5,13 @@
             <Type name="audio/ac3">
                 <Alias name="OMX.dolby.ac3.decoder" />
                 <Limit name="channel-count" max="6" />
-                <Limit name="sample-rate" ranges="32000,44100,48000" />
+                <Limit name="sample-rate" ranges="32000,44100,48000,88200,96000,192000,384000" />
                 <Limit name="bitrate" range="32000-640000" />
             </Type>
             <Type name="audio/eac3">
                 <Alias name="OMX.dolby.eac3.decoder" />
                 <Limit name="channel-count" max="8" />
-                <Limit name="sample-rate" ranges="32000,44100,48000" />
+                <Limit name="sample-rate" ranges="32000,44100,48000,88200,96000,192000,384000" />
                 <Limit name="bitrate" range="32000-6144000" />
             </Type>
             <Type name="audio/eac3-joc">
