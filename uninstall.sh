@@ -2,14 +2,14 @@
 
 MODDIR=${0%/*}
 
-for pidfile in "$MODDIR/logs/watchdog.pid" "$MODDIR/logs/codec2.pid" "$MODDIR/logs/dms.pid"; do
-    if [ -f "$pidfile" ]; then
-        kill "$(cat "$pidfile")" 2>/dev/null
-    fi
-done
-
-if [ -f /odm/.md_ph_001_dolby_probe ]; then
-    umount /odm 2>/dev/null
+if [ -f "$MODDIR/logs/watchdog.pid" ]; then
+    kill "$(cat "$MODDIR/logs/watchdog.pid")" 2>/dev/null
 fi
 
-setprop ctl.restart media
+for request in /data/user/*/com.cirrest.dolbycontrol.mdph001/files/restart_audio_service.request; do
+    [ -f "$request" ] && rm -f "$request"
+done
+
+if [ -f "$MODDIR/.reenable-atmos-on-uninstall" ]; then
+    rm -f /data/adb/modules/Atmos/disable
+fi

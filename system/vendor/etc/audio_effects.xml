@@ -32,11 +32,9 @@
         <!-- <library name="Mdequalizer" path="libmdequalizer.so"/> -->
         <!--MOONDROP PATCH END-->
 
-        <!--DOLBY DAX PROBE START-->
-        <library name="dap" path="libswdap_sp.so"/>
-        <library name="dvl" path="libdlbvol_sp.so"/>
-        <library name="gamedap" path="libswgamedap_sp.so"/>
-        <!--DOLBY DAX PROBE END-->
+        <!-- MIAD01 DAX1 START -->
+        <library name="dlbatmos" path="libdlbatmos.so"/>
+        <!-- MIAD01 DAX1 END -->
     </libraries>
 
     <!-- list of effects to load.
@@ -87,11 +85,9 @@
         <!-- <effect name="Mdequalizer" library="Mdequalizer" uuid="3f8c9a50-6a4c-11e8-9c2d-fa7ae01e645e"/> -->
         <!--MOONDROP PATCH END-->
 
-        <!--DOLBY DAX PROBE START-->
-        <effect name="dap" library="dap" uuid="9d4921da-8225-4f29-aefa-39537a04bcaa"/>
-        <effect name="dlb_music_listener" library="dvl" uuid="40f66c8b-5aa5-4345-8919-53ec431aaa98"/>
-        <effect name="gamedap" library="gamedap" uuid="3783c334-d3a0-4d13-874f-0032e5fb80e2"/>
-        <!--DOLBY DAX PROBE END-->
+        <!-- MIAD01 DAX1 START -->
+        <effect name="dlbatmos" library="dlbatmos" uuid="9d4921da-8225-4f29-aefa-39537a041337"/>
+        <!-- MIAD01 DAX1 END -->
     </effects>
 
     <!-- Audio pre processor configurations.
@@ -110,6 +106,42 @@
                 <apply effect="agc"/>
             </stream>
         </preprocess>
+
+    <!-- DsService owns one global session 0 instance. Keep the stream entries
+         empty so AudioTrack mixer output is processed once, not once here and
+         a second time by the global effect. -->
+    <postprocess>
+        <stream type="music">
+        </stream>
+        <stream type="ring">
+        </stream>
+        <stream type="alarm">
+        </stream>
+        <stream type="system">
+        </stream>
+        <stream type="voice_call">
+        </stream>
+        <stream type="notification">
+        </stream>
+        <stream type="bluetooth_sco">
+        </stream>
+        <stream type="dtmf">
+        </stream>
+        <stream type="enforced_audible">
+        </stream>
+        <stream type="accessibility">
+        </stream>
+        <stream type="tts">
+        </stream>
+        <stream type="assistant">
+        </stream>
+        <stream type="call_assistant">
+        </stream>
+        <stream type="patch">
+        </stream>
+        <stream type="rerouting">
+        </stream>
+    </postprocess>
 
     <!-- Audio post processor configurations.
          The post processor configuration is described in a "postprocess" element and consists in a
