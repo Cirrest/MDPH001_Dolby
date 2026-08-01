@@ -25,6 +25,7 @@ ui_print "- ⚠该模块为免费模块，自己逆向半年kernel适配手搓�
 ui_print "- ⚠禁止任何形式商业化、收费、二改⚠"
 ui_print "- ⚠该模块所有文件均已打上数字水印，均可追溯⚠"
 
+
 LEGACY_ATMOS="/data/adb/modules/Atmos"
 if [ -d "$LEGACY_ATMOS" ] && [ ! -f "$LEGACY_ATMOS/disable" ]; then
     ui_print "- Disabling the conflicting Dolby Atmos Magic Revision module"
