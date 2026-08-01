@@ -38,6 +38,8 @@ final class UiText {
         RESTART_REQUESTED,
         CONNECTED_ENABLED,
         CONNECTED_DISABLED,
+        PROCESSING_RELEASED,
+        ORIGINAL_AUDIO_PATH,
         ROUTE_UNKNOWN,
         ROUTE_HEADPHONE,
         ROUTE_BLUETOOTH,
@@ -109,6 +111,8 @@ final class UiText {
             case RESTART_REQUESTED: return "Audio service restart requested";
             case CONNECTED_ENABLED: return "Connected, processing enabled";
             case CONNECTED_DISABLED: return "Connected, processing disabled";
+            case PROCESSING_RELEASED: return "Dolby processing released";
+            case ORIGINAL_AUDIO_PATH: return "Original audio path";
             case ROUTE_UNKNOWN: return "Unknown";
             case ROUTE_HEADPHONE: return "Headphones";
             case ROUTE_BLUETOOTH: return "Bluetooth";
@@ -162,6 +166,8 @@ final class UiText {
             case RESTART_REQUESTED: return "\u5df2\u8bf7\u6c42\u91cd\u542f\u97f3\u9891\u670d\u52a1";
             case CONNECTED_ENABLED: return "\u5df2\u8fde\u63a5\uff0c\u5904\u7406\u5f00\u542f";
             case CONNECTED_DISABLED: return "\u5df2\u8fde\u63a5\uff0c\u5904\u7406\u5173\u95ed";
+            case PROCESSING_RELEASED: return "\u675c\u6bd4\u5904\u7406\u5df2\u91ca\u653e";
+            case ORIGINAL_AUDIO_PATH: return "\u539f\u5382\u97f3\u9891\u8def\u5f84";
             case ROUTE_UNKNOWN: return "\u672a\u77e5";
             case ROUTE_HEADPHONE: return "\u8033\u673a";
             case ROUTE_BLUETOOTH: return "\u84dd\u7259";

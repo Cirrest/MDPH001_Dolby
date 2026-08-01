@@ -22,6 +22,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,10 @@ public final class DolbyControlService extends Service {
                             @Override
                             public void run() {
                                 try {
+                                    if (!isGlobalProcessingEnabled()) {
+                                        releaseGlobalProcessing();
+                                        return;
+                                    }
                                     initializeBackendState();
                                     applyDesiredState(backend);
                                     refreshSnapshot();
@@ -85,7 +90,13 @@ public final class DolbyControlService extends Service {
 
                 @Override
                 public void onDisconnected() {
-                    publishDisconnected("Dolby DsService disconnected");
+                    if (isGlobalProcessingEnabled()) {
+                        publishDisconnected("Dolby DsService disconnected");
+                    } else if (GlobalProcessingState.isDisabled(getFilesDir())) {
+                        publishReleased();
+                    } else {
+                        publishDisconnected("Dolby processing release is pending");
+                    }
                 }
             };
 
@@ -93,6 +104,11 @@ public final class DolbyControlService extends Service {
         @Override
         public void run() {
             try {
+                if (!isGlobalProcessingEnabled()) {
+                    releaseGlobalProcessing();
+                    return;
+                }
+                GlobalProcessingState.setDisabled(getFilesDir(), false);
                 ensureBackend();
                 if (backend.isConnected()) {
                     enforceDesiredState();
@@ -159,8 +175,6 @@ public final class DolbyControlService extends Service {
         audioManager.registerAudioDeviceCallback(deviceCallback, mainHandler);
         audioManager.registerAudioPlaybackCallback(playbackCallback, mainHandler);
 
-        backend = new DolbyDsBackend(this, backendListener);
-        backend.bind();
         worker.post(healthCheck);
     }
 
@@ -198,6 +212,11 @@ public final class DolbyControlService extends Service {
             @Override
             public void run() {
                 try {
+                    if (!isGlobalProcessingEnabled()) {
+                        releaseGlobalProcessing();
+                        return;
+                    }
+                    GlobalProcessingState.setDisabled(getFilesDir(), false);
                     ensureBackend();
                     if (volumeMayHaveChanged && ModePolicy.usesCustomGeq(getDesiredMode())) {
                         applyCustomGeq(backend);
@@ -218,6 +237,11 @@ public final class DolbyControlService extends Service {
             @Override
             public void run() {
                 try {
+                    if (!isGlobalProcessingEnabled()) {
+                        releaseGlobalProcessing();
+                        return;
+                    }
+                    GlobalProcessingState.setDisabled(getFilesDir(), false);
                     ensureBackend();
                     ensureDesiredProfile();
                     operation.run(backend);
@@ -244,7 +268,12 @@ public final class DolbyControlService extends Service {
                         @Override
                         public void run() {
                             try {
-                                ensureBackend();
+                                if (isGlobalProcessingEnabled()) {
+                                    GlobalProcessingState.setDisabled(getFilesDir(), false);
+                                    ensureBackend();
+                                } else {
+                                    releaseGlobalProcessing();
+                                }
                             } catch (Throwable error) {
                                 handleBackendFailure(error);
                             }
@@ -258,6 +287,9 @@ public final class DolbyControlService extends Service {
     }
 
     private void ensureBackend() {
+        if (!isGlobalProcessingEnabled()) {
+            throw new IllegalStateException("Global Dolby processing is released");
+        }
         if (backend == null) {
             backend = new DolbyDsBackend(this, backendListener);
         }
@@ -403,6 +435,7 @@ public final class DolbyControlService extends Service {
         ensureBackend();
         DolbySnapshot next = new DolbySnapshot();
         next.connected = true;
+        next.released = false;
         next.hasControl = true;
         next.enabled = backend.getEnabled();
         next.mode = getDesiredMode();
@@ -435,7 +468,7 @@ public final class DolbyControlService extends Service {
     }
 
     private void handleBackendFailure(Throwable error) {
-        Log.e(TAG, "Dolby DAX1 backend failure", error);
+        Log.e(TAG, "Dolby DAX2 backend failure", error);
         publishDisconnected(
                 error.getClass().getSimpleName() + ": " + String.valueOf(error.getMessage()));
     }
@@ -444,6 +477,7 @@ public final class DolbyControlService extends Service {
         DolbySnapshot failed;
         synchronized (snapshotLock) {
             snapshot.connected = false;
+            snapshot.released = false;
             snapshot.hasControl = false;
             snapshot.lastError = message;
             snapshot.tuningStatus = uiText == null
@@ -452,6 +486,44 @@ public final class DolbyControlService extends Service {
             failed = snapshot.copy();
         }
         notifyListeners(failed);
+    }
+
+    private void publishReleased() {
+        DolbySnapshot released;
+        synchronized (snapshotLock) {
+            snapshot.connected = false;
+            snapshot.released = true;
+            snapshot.enabled = false;
+            snapshot.hasControl = false;
+            snapshot.lastError = "";
+            snapshot.tuningStatus = uiText == null
+                    ? "Original audio path"
+                    : uiText.get(UiText.Key.ORIGINAL_AUDIO_PATH);
+            if (audioManager != null) {
+                snapshot.outputRoute = getOutputRoute();
+                snapshot.volume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                snapshot.maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+            }
+            released = snapshot.copy();
+        }
+        notifyListeners(released);
+    }
+
+    private boolean isGlobalProcessingEnabled() {
+        return preferences == null || preferences.getBoolean(KEY_ENABLED, true);
+    }
+
+    private void releaseGlobalProcessing() throws IOException {
+        if (backend != null && backend.isConnected()) {
+            try {
+                backend.setEnabled(false);
+            } catch (RuntimeException error) {
+                Log.w(TAG, "Unable to apply the DAX2 off profile before release", error);
+            }
+        }
+        GlobalProcessingState.setDisabled(getFilesDir(), true);
+        closeBackend();
+        publishReleased();
     }
 
     private void notifyListeners(final DolbySnapshot value) {
@@ -585,6 +657,7 @@ public final class DolbyControlService extends Service {
     private static void copyInto(DolbySnapshot from, DolbySnapshot to) {
         DolbySnapshot copy = from.copy();
         to.connected = copy.connected;
+        to.released = copy.released;
         to.enabled = copy.enabled;
         to.hasControl = copy.hasControl;
         to.mode = copy.mode;
@@ -623,10 +696,24 @@ public final class DolbyControlService extends Service {
 
         void setEnabled(final boolean enabled) {
             preferences.edit().putBoolean(KEY_ENABLED, enabled).apply();
-            postOperation(new BackendOperation() {
+            if (worker == null) {
+                return;
+            }
+            worker.post(new Runnable() {
                 @Override
-                public void run(DolbyDsBackend target) {
-                    applyDesiredState(target);
+                public void run() {
+                    try {
+                        if (!enabled) {
+                            releaseGlobalProcessing();
+                            return;
+                        }
+                        GlobalProcessingState.setDisabled(getFilesDir(), false);
+                        ensureBackend();
+                        applyDesiredState(backend);
+                        refreshSnapshot();
+                    } catch (Throwable error) {
+                        handleBackendFailure(error);
+                    }
                 }
             });
         }

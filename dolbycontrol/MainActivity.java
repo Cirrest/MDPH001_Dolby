@@ -394,9 +394,11 @@ public final class MainActivity extends Activity implements DolbyControlService.
     private void render(DolbySnapshot value) {
         rendering = true;
         try {
-            statusDot.setTextColor(value.connected && value.hasControl
+            statusDot.setTextColor(value.released || (value.connected && value.hasControl)
                     ? statusConnected() : statusDisconnected());
-            if (value.connected && value.hasControl) {
+            if (value.released) {
+                statusText.setText(uiText.get(UiText.Key.PROCESSING_RELEASED));
+            } else if (value.connected && value.hasControl) {
                 statusText.setText(value.enabled
                         ? uiText.get(UiText.Key.CONNECTED_ENABLED)
                         : uiText.get(UiText.Key.CONNECTED_DISABLED));

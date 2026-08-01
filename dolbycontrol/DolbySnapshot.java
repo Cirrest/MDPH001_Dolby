@@ -2,6 +2,7 @@ package com.mdph.dolbycontrol;
 
 final class DolbySnapshot {
     boolean connected;
+    boolean released;
     boolean enabled;
     boolean hasControl;
     int mode;
@@ -24,6 +25,7 @@ final class DolbySnapshot {
     DolbySnapshot copy() {
         DolbySnapshot copy = new DolbySnapshot();
         copy.connected = connected;
+        copy.released = released;
         copy.enabled = enabled;
         copy.hasControl = hasControl;
         copy.mode = mode;
