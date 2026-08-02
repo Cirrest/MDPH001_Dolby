@@ -27,6 +27,7 @@ ui_print "- AC-3, E-AC-3 ， AC-4 音频解码器"
 ui_print "- DMS、DXP、DAX服务, DAP控制器、私有NDK库等"
 ui_print "- DVL服务会正常注册，但不会自动附加到该音频框架。(省的全局SRC绕过这特色功能没了)"
 
+
 LEGACY_ATMOS="/data/adb/modules/Atmos"
 if [ -d "$LEGACY_ATMOS" ] && [ ! -f "$LEGACY_ATMOS/disable" ]; then
     ui_print "- Disabling the conflicting Dolby Atmos Magic Revision module"

@@ -1,6 +1,6 @@
 id=md_ph_001_dolbyatmos
 name=MIAD01 Dolby Atoms
-version=2.1.1
-versionCode=211
+version=2.1.2
+versionCode=212
 author=Cirrest
-description=为A14水月雨MIAD01设备适配杜比全景声。手搓DMS/DAX/DAX服务、DAP控制器，并添加Dolby AC-4/AC-3/E-AC3音频解码器，iPad同款双耳空间渲染，可与原厂AudioConsole同开。模块免费，禁止任何形式商业化、二改、收费，文件均已打上数字水印均可追溯。
+description=为A14水月雨MIAD01设备适配杜比全景声。手搓DMS/DXP/DAX服务、DAP控制器，并添加Dolby AC-4/AC-3/E-AC3/JOC音频解码器，iPad同款双耳空间渲染，可与原厂AudioConsole同开。模块免费，禁止任何形式商业化、二改、收费，文件均已打上数字水印均可追溯。

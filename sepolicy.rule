@@ -1,4 +1,4 @@
-# Rules used by the verified DAX1 v4.7 engine on MediaTek audio services.
+# Rules used by the verified DAX Cirrest engine on MediaTek audio services.
 allow system_server system_file file write
 allow { system_file system_lib_file vendor_file vendor_configs_file } labeledfs filesystem associate
 allow init { system_file system_lib_file vendor_file vendor_configs_file } { dir file } relabelfrom
